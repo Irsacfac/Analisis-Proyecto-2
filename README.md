@@ -1,2 +1,2 @@
 # Analisis-Proyecto-2
-2D Path Tracing
+2D Path Tracing 
