@@ -4,11 +4,12 @@ import math
 def raySegmentIntersect(ori, dir, p1, p2):
 
     #calculate vectors
+    #calcular vectores
     v1 = ori - p1
     v2 = p2 - p1
     v3 = Point(-dir.y, dir.x)
 
-    
+    #dot product v2 y v3
     dot = v2.dot(v3)
     if (abs(dot) < 0.000001):
         return -1.0
@@ -21,22 +22,25 @@ def raySegmentIntersect(ori, dir, p1, p2):
 
     return -1.0
 
+#largo de un segmento
 def length(v1):
     #assumes v1 starts at (0,0)
     return math.sqrt(v1.x*v1.x + v1.y*v1.y)
 
-
+#normalizacion
 def normalize(v1):
     #assumes v1 starts at (0,0)
     v1 = v1 / length(v1)
     return v1
 
+#interseccion punto
 def intersectionPoint(ori, dir, dist):
     x = ori.x + dir.x*dist
     y = ori.y + dir.y*dist
 
     return Point(x,y)
 
+#angulo coseno
 def cosAngle(a, b, ori):
     #returns the cosine of the angle of 2 vectors that part from ori
 
