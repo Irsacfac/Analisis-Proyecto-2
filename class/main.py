@@ -35,7 +35,7 @@ i = Image.new("RGB", (500, 500), (0, 0, 0) )
 px = np.array(i)
 
 #reference image for background color
-im_file = Image.open("fondo.jpg")
+im_file = Image.open("Fondo.jpg")
 ref = np.array(im_file)
 
 #light positions
