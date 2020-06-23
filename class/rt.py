@@ -22,6 +22,25 @@ def raySegmentIntersect(ori, dir, p1, p2):
 
     return -1.0
 
+
+def rayCircleIntersect(ori, dir, c, r):
+    #v1 vevctor que va del origen al centro del circulo
+    v1 = c - ori
+    #se proyecta sobre el vector de direccion
+    #para obtener el punto mas cercano al centro del circulo
+    R = v1.dot(dir)/(length(dir)*length(dir))
+    closest = Point(R*dir.x, R*dir.y) + ori
+
+    #calculamos b como la distancia desde el centro al punto mas cercano
+    b = length(c - closest)
+    #ai b es mayor que el radio, no hay interseccion
+    if b > r:
+        return -1.0
+    #obtenemos h usando pitagoras
+    h = math.sqrt(r*r - b*b)
+    #el vector cruza el circulo en 2 distancias: R-h y R+h
+    return (R-h, R+h)
+
 #largo de un segmento
 def length(v1):
     #assumes v1 starts at (0,0)
