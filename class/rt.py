@@ -41,6 +41,11 @@ def rayCircleIntersect(ori, dir, c, r):
     #el vector cruza el circulo en 2 distancias: R-h y R+h
     return (R-h, R+h)
 
+def inRadio(p, c, r):
+    x = p.x - c.x
+    y = p.y - c.y
+    return r == math.sqrt(x*x + y*y)
+
 #largo de un segmento
 def length(v1):
     #assumes v1 starts at (0,0)
