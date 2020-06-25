@@ -24,7 +24,7 @@ def raySegmentIntersect(ori, dir, p1, p2):
 
 
 def rayCircleIntersect(ori, dir, c, r):
-    #v1 vevctor que va del origen al centro del circulo
+    #v1 vector que va del origen al centro del circulo
     v1 = c - ori
     #se proyecta sobre el vector de direccion
     #para obtener el punto mas cercano al centro del circulo
@@ -40,6 +40,15 @@ def rayCircleIntersect(ori, dir, c, r):
     h = math.sqrt(r*r - b*b)
     #el vector cruza el circulo en 2 distancias: R-h y R+h
     return (R-h, R+h)
+
+def segCircleIntersect(ori, dir, p, c, r):
+    #calculamos la pendiente
+    m = (ori.y - p.y)/(ori.x - p.x)
+    #ecuacion de segundo grado
+    a =  1 + m*m
+    b = (-2)*(c.x - m*p.y + m*m*p.x + c.y*m)
+    c1 = c.x*c.x + p.y*p.y - 2*p.y*(m*p.x + c.y) + m*m*p.x*p.x + 2*c.y*m*p.x + c.y*c.y - r*r
+    return b*b - 4*a*c1
 
 def inRadio(p, c, r):
     x = p.x - c.x
