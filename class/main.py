@@ -3,6 +3,7 @@ import pygame
 import random
 from PIL import Image
 from Point import *
+from surface import *
 import rt
 import math
 import threading
