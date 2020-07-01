@@ -9,7 +9,56 @@ import threading
 
 
 def raytrace():
-    pixel = 0
+    #Raytraces the scene progessively
+    while True:
+        #random point in the image
+        point = Point(random.uniform(0, 500), random.uniform(0, 500))
+        #pixel color
+        pixel = 0
+
+        for source in sources:
+            #calculates direction to light source
+            
+            dir = source-point
+            #add jitter
+            #dir.x += random.uniform(0, 25)
+            #dir.y += random.uniform(0, 25)
+
+            #distance between point and light source
+            length = rt.length(dir)
+            #normalized distance to source
+            length2 = rt.length(rt.normalize(dir))
+            bandera=False
+            free = True
+            for seg in segments:                
+                #check if ray intersects with segment
+                dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
+                #if intersection, or if intersection is closer than light source
+                if  dist > 0 and length2>dist:
+                    free = False
+                    break
+            
+            for circle in circles:
+                dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
+                dist-=circle[1]*0.004
+                if  dist > 0 and length2>dist:
+                    free = False
+                    break
+                
+            if free:        
+                intensity = (1-(length/500))**2
+                #print(len)
+                #intensity = max(0, min(intensity, 255))
+                values = (ref[int(point.y)][int(point.x)])[:3]
+                #combine color, light source and light color
+                values = values * intensity * light
+                
+                #add all light sources 
+                pixel += values
+            
+            #average pixel value and assign
+            px[int(point.x)][int(point.y)] = pixel // len(sources)
+                
 
 
 def getFrame():
@@ -39,7 +88,7 @@ im_file = Image.open("Fondo.jpg")
 ref = np.array(im_file)
 
 #light positions
-sources = [ Point(250,250), Point(250,210) ]
+sources = [ Point(250,300), Point(250,210) ]
 
 #light color
 light = np.array([0.65, 0.65, 0.3])
@@ -48,11 +97,12 @@ light = np.array([0.65, 0.65, 0.3])
 segments = [
             
             #([Point(180, 230), Point(330, 230)])
-            ([Point(240, 230), Point(330, 230)])
-    
+            ([Point(180, 230), Point(260, 230)])
             ]
 
-
+circles = [
+            (Point(330, 180),30)
+           ]
 #thread setup
 t = threading.Thread(target = raytrace) # f being the function that tells how the ball should move
 t.setDaemon(True) # Alternatively, you can use "t.daemon = True"

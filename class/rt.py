@@ -33,13 +33,18 @@ def rayCircleIntersect(ori, dir, c, r):
 
     #calculamos b como la distancia desde el centro al punto mas cercano
     b = length(c - closest)
+    #print("B es: ")
+    #print(b)
+    #print("R es: ")
+    #print(r)
     #ai b es mayor que el radio, no hay interseccion
     if b > r:
         return -1.0
     #obtenemos h usando pitagoras
     h = math.sqrt(r*r - b*b)
     #el vector cruza el circulo en 2 distancias: R-h y R+h
-    return (R-h, R+h)
+    return R
+    #return (R-h, R+h)
 
 def segCircleIntersect(ori, dir, p, c, r):
     #calculamos la pendiente
