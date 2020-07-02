@@ -8,6 +8,16 @@ import rt
 import math
 import threading
 
+def especularidadTrue(point, source, seg):
+    medio=Point((seg[0].x+seg[1].x)/2,(seg[0].y+seg[1].y)/2)
+    nuevaFuente=Point(2*medio.x-source.x,2*medio.y-source.y)
+    dir = nuevaFuente-point
+    length = rt.length(dir)
+    length2 = rt.length(rt.normalize(dir))
+    dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
+    if  dist > 0 and length2>dist:
+        return length
+    return 0
 
 def raytrace():
     #Raytraces the scene progessively
@@ -29,19 +39,22 @@ def raytrace():
             length = rt.length(dir)
             #normalized distance to source
             length2 = rt.length(rt.normalize(dir))
-            bandera=False
+            listSeg=[]
             free = True
+            especularidad=0
             for seg in segments:                
                 #check if ray intersects with segment
                 dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
+                if seg[2]==True:
+                    especularidad=especularidadTrue(point, source, seg)
                 #if intersection, or if intersection is closer than light source
                 if  dist > 0 and length2>dist:
                     free = False
                     break
-            
+            dir = source-point
             for circle in circles:
                 dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-                dist-=circle[1]*0.004
+                dist-=circle[1]*0.0045
                 if  dist > 0 and length2>dist:
                     free = False
                     break
@@ -56,11 +69,20 @@ def raytrace():
                 
                 #add all light sources 
                 pixel += values
+                if especularidad!=0:
+                    intensity = (1-(especularidad/500))**2
+                    #print(len)
+                    #intensity = max(0, min(intensity, 255))
+                    values = (ref[int(point.y)][int(point.x)])[:3]
+                    #combine color, light source and light color
+                    values = values * intensity * light
+                    
+                    #add all light sources 
+                    pixel += values
             
             #average pixel value and assign
             px[int(point.x)][int(point.y)] = pixel // len(sources)
                 
-
 
 def getFrame():
     return px
@@ -89,8 +111,11 @@ im_file = Image.open("Fondo.jpg")
 ref = np.array(im_file)
 
 #light positions
-sources = [ Point(250,300), Point(250,210) ]
-
+sources = [ Point(250,300), Point(250,210)]
+lineal_sources = [
+                 ([Point(10, 40), Point(30, 70)])#,
+                 #([Point(100, 160), Point(100, 260)])
+                 ]
 #light color
 light = np.array([0.65, 0.65, 0.3])
 
@@ -98,7 +123,8 @@ light = np.array([0.65, 0.65, 0.3])
 segments = [
             
             #([Point(180, 230), Point(330, 230)])
-            ([Point(180, 230), Point(260, 230)])
+            ([Point(190, 230), Point(260, 230), True]),
+            ([Point(100, 160), Point(100, 260), True])
             ]
 
 circles = [

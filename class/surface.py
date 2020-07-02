@@ -2,9 +2,9 @@ from Point import *
 
 class surface:
 
-    a = null
-    b = null
-    especularidad = false
+    a = None
+    b = None
+    especularidad = False
 
     def __init__(self, a, b, esp):
         self.a = a
