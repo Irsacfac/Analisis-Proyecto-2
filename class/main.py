@@ -42,6 +42,34 @@ def raytrace():
             listSeg=[]
             free = True
             especularidad=0
+            ########
+            for surface in surfaces:
+                x1, y1 = 0, 0
+                if (surface.itsIn(point)):
+                    if(surface.especularidad):
+                        free = True
+                    else:
+                        right = source.x <= 250
+                        up = source.y <= 250
+                        reflexion = [random.uniform(1, 50), random.uniform(1, 20)]
+                        if(right):
+                            x1 = point.x + point.x*relexcion[0]/100
+                        else:
+                            x1 = point.x - point.x*relexcion[0]/100
+                        if(up):
+                            y1 = point.y + point.y*relexcion[0]/100
+                        else:
+                            y1 = point.y - point.y*relexcion[0]/100
+                        intensity = (1-(length/100))**2
+                        #print(len)
+                        #intensity = max(0, min(intensity, 255))
+                        values = (ref[int(y1)][int(x1)])[:3]
+                        #combine color, light source and light color
+                        values = values * intensity * light * 100
+                    
+                        #add all light sources 
+                        pixel += values
+            ##############
             for seg in segments:                
                 #check if ray intersects with segment
                 dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
@@ -130,6 +158,13 @@ segments = [
 circles = [
             (Point(330, 180),30)
            ]
+############
+surfaces = [
+
+    (surface(Point(83,31),Point(420,165),False)),
+
+    ]
+#############
 #thread setup
 t = threading.Thread(target = raytrace) # f being the function that tells how the ball should move
 t.setDaemon(True) # Alternatively, you can use "t.daemon = True"
