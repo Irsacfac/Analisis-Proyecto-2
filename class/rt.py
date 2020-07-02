@@ -78,7 +78,7 @@ def intersectionPoint(ori, dir, dist):
 
     return Point(x,y)
 
-#angulo coseno
+#angulo coseno entre vectores
 def cosAngle(a, b, ori):
     #returns the cosine of the angle of 2 vectors that part from ori
 
@@ -86,4 +86,15 @@ def cosAngle(a, b, ori):
     v2 = ori - b
 
     cos = v1.dot(v2)/(length(v1)*length(v2))
+    return cos
+
+#coseno formado por puntos
+def cosAngleP(a, b):
+    v1= a - b
+    opposite = v1.x
+    hypotenuse = math.sqrt(v1.x*v1.x + v1.y*v1.y)
+    if(opposite < 0):
+        opposite = opposite*(-1)
+
+    cos = opposite/hypotenuse
     return cos
