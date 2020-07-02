@@ -53,22 +53,30 @@ def raytrace():
                         up = source.y <= point.y
                         reflexion = [random.uniform(1, 50), random.uniform(1, 20)]
                         if(right):
-                            x1 = point.x + point.x*reflexcion[0]/100
+                            x1 = point.x + point.x*reflexion[0]/100
                         else:
-                            x1 = point.x - point.x*reflexcion[0]/100
+                            x1 = point.x - point.x*reflexion[0]/100
                         if(up):
-                            y1 = point.y - point.y*reflexcion[1]/100
+                            y1 = point.y - point.y*reflexion[1]/100
                         else:
-                            y1 = point.y + point.y*reflexcion[1]/100
+                            y1 = point.y + point.y*reflexion[1]/100
+                        if(x1 > 500 or y1 > 500):
+                            x1 = x1 - x1 * 0.3
+                            y1 = y1 - y1 * 0.3
+                        if(x1 < 0 or y1 < 0):
+                            x1 = x1 + x1 * 0.3
+                            y1 = y1 + y1 * 0.3
                         intensity = (1-(length/100))**2
                         #print(len)
                         #intensity = max(0, min(intensity, 255))
                         values = (ref[int(y1)][int(x1)])[:3]
                         #combine color, light source and light color
-                        values = values * intensity * light * 100
+                        values = values * intensity * light / 10
                     
                         #add all light sources 
                         pixel += values
+                        especularidad = 1
+                        break
             ##############
             for seg in segments:                
                 #check if ray intersects with segment
@@ -77,12 +85,12 @@ def raytrace():
                     especularidad=especularidadTrue(point, source, seg)
                 #if intersection, or if intersection is closer than light source
                 if  dist > 0 and length2>dist:
-                    free = False
+                    #free = False
                     break
             dir = source-point
             for circle in circles:
                 dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-                dist-=circle[1]*0.0045
+                dist-=circle[1]*0.0015
                 if  dist > 0 and length2>dist:
                     free = False
                     break
@@ -139,29 +147,31 @@ im_file = Image.open("Fondo.jpg")
 ref = np.array(im_file)
 
 #light positions
-sources = [ Point(250,300), Point(250,210)]
+sources = [ Point(200,100), Point(350,100)]
 lineal_sources = [
                  ([Point(10, 40), Point(30, 70)])#,
                  #([Point(100, 160), Point(100, 260)])
                  ]
 #light color
-light = np.array([0.65, 0.65, 0.3])
+light = np.array([0.85, 0.85, 0.55])
 
 #warning, point order affects intersection test!!
 segments = [
             
             #([Point(180, 230), Point(330, 230)])
-            ([Point(190, 230), Point(260, 230), True]),
+            #([Point(190, 230), Point(260, 230), True]),
             ([Point(100, 160), Point(100, 260), True])
             ]
 
 circles = [
-            (Point(330, 180),30)
+            (Point(330, 180),32)
            ]
 ############
 surfaces = [
 
-    (surface(Point(83,31),Point(420,165),False)),
+    (surface(Point(383,31),Point(420,65),False)),
+    (surface(Point(43,231),Point(82,165),False)),
+    (surface(Point(83,131),Point(120,145),False)),
 
     ]
 #############
