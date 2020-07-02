@@ -49,17 +49,17 @@ def raytrace():
                     if(surface.especularidad):
                         free = True
                     else:
-                        right = source.x <= 250
-                        up = source.y <= 250
+                        right = source.x <= point.x
+                        up = source.y <= point.y
                         reflexion = [random.uniform(1, 50), random.uniform(1, 20)]
                         if(right):
-                            x1 = point.x + point.x*relexcion[0]/100
+                            x1 = point.x + point.x*reflexcion[0]/100
                         else:
-                            x1 = point.x - point.x*relexcion[0]/100
+                            x1 = point.x - point.x*reflexcion[0]/100
                         if(up):
-                            y1 = point.y + point.y*relexcion[0]/100
+                            y1 = point.y - point.y*reflexcion[1]/100
                         else:
-                            y1 = point.y - point.y*relexcion[0]/100
+                            y1 = point.y + point.y*reflexcion[1]/100
                         intensity = (1-(length/100))**2
                         #print(len)
                         #intensity = max(0, min(intensity, 255))
