@@ -58,7 +58,7 @@ def segCircleIntersect(ori, dir, p, c, r):
 def inRadio(p, c, r):
     x = p.x - c.x
     y = p.y - c.y
-    return r >= math.sqrt(x*x + y*y)
+    return r == math.sqrt(x*x + y*y)
 
 #largo de un segmento
 def length(v1):
