@@ -1,3 +1,5 @@
+import math
+
 class Point:
 
     x = 0.0
@@ -28,4 +30,9 @@ class Point:
 
     #toString
     def __str__(self):
-        return "[ {}, {}]".format(self.x, self.y) 
+        return "[ {}, {}]".format(self.x, self.y)
+
+    def distance(self, p1,p2):
+       sq1 = (p1.x-p2.x)*(p1.x-p2.x)
+       sq2 = (p1.y-p2.y)*(p1.y-p2.y)
+       return math.sqrt(sq1 + sq2)

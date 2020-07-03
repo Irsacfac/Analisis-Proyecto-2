@@ -25,8 +25,9 @@ def especularidadFalseCircle(point, source, circle):
     dir = nuevaFuente-point
     length = rt.length(dir)
     length2 = rt.length(rt.normalize(dir))
+    distanciaFuente=point.distance(circle[0],nuevaFuente)
     dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-    dist-=circle[1]*0.0015
+    dist-=circle[1]*distanciaFuente*0.00001
     if  dist > 0 and length2>dist:
         return length
     return 0
@@ -103,8 +104,9 @@ def raytrace():
                     break
             dir = source-point
             for circle in circles:
+                distanciaFuente=point.distance(circle[0],source)
                 dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-                dist-=circle[1]*0.0015
+                dist-=circle[1]*distanciaFuente*0.00001
                 if circle[2]==False:
                     especularidadC=especularidadFalseCircle(point, source, circle)
                     colorB=circle[3]
