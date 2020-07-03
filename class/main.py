@@ -1,5 +1,6 @@
 import numpy as np 
 import pygame
+from time import time
 import random
 from PIL import Image
 from Point import *
@@ -45,7 +46,7 @@ def especularidadTrue(point, source, seg):
     #distancia desde origen hasta interseccion, en eje x
     d = x-source.x
     if(d < 0):
-        reflejo = Point(x-d, source.y)
+        reflejo = Point(x+d, source.y)
     else:
         reflejo = Point(x+d, source.y)
 
@@ -273,9 +274,16 @@ t.setDaemon(True) # Alternatively, you can use "t.daemon = True"
 t.start()
 
 #main loop
+tiempo_inicial = time() 
 while not done:
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    tiempo_final = time() 
+ 
+                    tiempo_ejecucion = tiempo_final - tiempo_inicial
+ 
+                    print ('El tiempo de ejecucion fue:',tiempo_ejecucion)
+                    
                     done = True
 
         # Clear screen to white before drawing 
@@ -290,3 +298,4 @@ while not done:
 
         pygame.display.flip()
         clock.tick(60)
+
