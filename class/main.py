@@ -19,6 +19,17 @@ def especularidadFalse(point, source, seg):
         return length
     return 0
 
+def rayRefraction(point, source, seg):
+    distancia=point.distance(seg[0],seg[1])
+    nuevaFuente=Point(source.x+(distancia*2),source.y)
+    dir = nuevaFuente-point
+    length = rt.length(dir)
+    length2 = rt.length(rt.normalize(dir))
+    dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
+    if  dist > 0 and length2>dist:
+        return length
+    return 0
+
 def especularidadTrue(point, source, seg):
     #ecuacion recta punto-fuente
     m1 = (point.y-source.y)/(point.x-source.x)
@@ -88,21 +99,34 @@ def raytrace():
             length2 = rt.length(rt.normalize(dir))
             listSeg=[]
             free = True
-            especularidad=0
+            especularidadF=0
+            especularidadT=0
             especularidadC=0
+            refraccion=0
             colorB=0
+            transparencia=1
+            transparenciaR=1
             
             for seg in segments:                
                 #check if ray intersects with segment
                 dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
-                if seg[2]==False:
-                    especularidad=especularidadFalse(point, source, seg)
-                else:
+                if seg[2]==1:
+                    especularidadF=especularidadFalse(point, source, seg)
+                if seg[2]==2:
                     #data = especularidadTrue(point, source, seg)
-                    especularidad = especularidadTrue(point, source, seg)
+                    especularidadT=especularidadTrue(point, source, seg)
+                if seg[2]==4:
+                    refraccion=rayRefraction(point, source, seg)
                 #if intersection, or if intersection is closer than light source
                 if  dist > 0 and length2>dist:
-                    free = False
+                    if seg[2]==3:
+                        transparencia=3
+                    else:
+                        free = False
+                        if seg[2]==4 and refraccion!=0:
+                            free = True
+                            transparenciaR=3
+                            
                     break
             dir = source-point
             for circle in circles:
@@ -121,7 +145,8 @@ def raytrace():
                 
             if free:        
                 intensity = (1-(length/500))**2
-                #print(len)
+                intensity/=transparencia
+                intensity/=transparenciaR
                 #intensity = max(0, min(intensity, 255))
                 values = (ref[int(point.y)][int(point.x)])[:3]
                 #combine color, light source and light color
@@ -129,8 +154,8 @@ def raytrace():
                 
                 #add all light sources 
                 pixel += values
-                if especularidad!=0:
-                    intensity = (1-(especularidad/500))**2
+                if especularidadF!=0:
+                    intensity = (1-(especularidadF/500))**2
                     intensity/=2
                     #print(len)
                     #intensity = max(0, min(intensity, 255))
@@ -140,7 +165,28 @@ def raytrace():
                     
                     #add all light sources 
                     pixel += values
-
+                if especularidadT!=0:
+                    intensity = (1-(especularidadT/500))**2
+                    intensity/=2
+                    #print(len)
+                    #intensity = max(0, min(intensity, 255))
+                    values = (ref[int(point.y)][int(point.x)])[:3]
+                    #combine color, light source and light color
+                    values = values * intensity * light
+                    
+                    #add all light sources 
+                    pixel += values
+                if refraccion!=0:
+                    intensity = (1-(refraccion/500))**2
+                    intensity/=2
+                    #print(len)
+                    #intensity = max(0, min(intensity, 255))
+                    values = (ref[int(point.y)][int(point.x)])[:3]
+                    #combine color, light source and light color
+                    values = values * intensity * light
+                    
+                    #add all light sources 
+                    pixel += values
                     
                 if especularidadC!=0:
                     intensity = (1-(especularidadC/500))**2
@@ -151,7 +197,7 @@ def raytrace():
                     #combine color, light source and light color
                     if colorB!=0:
                         intensity*=2
-                        values = np.asarray(colorB) * intensity * light
+                        values = np.asarray(colorB) * intensity*2 * light
                     else:
                         values = values * intensity * light
                     #add all light sources
@@ -187,8 +233,8 @@ im_file = Image.open("Fondo.png")
 ref = np.array(im_file)
 
 #light positions
-sources = [ Point(180,100),
-            #Point(250,310),
+sources = [ Point(190,230),
+            Point(250,270),
             #Point(350,400)
             ]
 lineal_sources = [
@@ -199,14 +245,17 @@ lineal_sources = [
 light = np.array([0.85, 0.85, 0.55])
 
 #warning, point order affects intersection test!!
+
+#0=Ninguno
+#1=Especularidad False
+#2=Especularidad True
+#3=Transparencia
+#4=Refraccion
 segments = [
-            
-            #([Point(190, 230), Point(260, 230), False]),
-            #([Point(100, 160), Point(101, 260), True]),
-            #([Point(190, 230), Point(260, 230), True]),
-            ([Point(190, 230), Point(260, 231), True]),
-            #([Point(290, 330), Point(360, 331), True]),
-            
+            ([Point(50, 180), Point(50, 280), 1]),
+            ([Point(30, 60), Point(100, 60), 2]),
+            ([Point(70, 350), Point(150, 400), 3]),
+            ([Point(280, 330), Point(370, 330), 4]),
             ]
 
 
