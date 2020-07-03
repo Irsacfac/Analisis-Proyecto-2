@@ -214,11 +214,6 @@ circles = [
             (Point(330, 180),32,False,[84,121,215])
             ]
 ############(84,121,215)
-surfaces = [
-
-    #(surface(Point(383,31),Point(420,65),False)),
-    #(surface(Point(43,231),Point(82,165),False)),
-    #(surface(Point(83,131),Point(120,145),False)),
 
 #thread setup
 t = threading.Thread(target = raytrace) # f being the function that tells how the ball should move
