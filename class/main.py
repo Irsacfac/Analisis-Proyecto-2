@@ -8,13 +8,25 @@ import rt
 import math
 import threading
 
-def especularidadTrue(point, source, seg):
+def especularidadFalse(point, source, seg):
     medio=Point((seg[0].x+seg[1].x)/2,(seg[0].y+seg[1].y)/2)
     nuevaFuente=Point(2*medio.x-source.x,2*medio.y-source.y)
     dir = nuevaFuente-point
     length = rt.length(dir)
     length2 = rt.length(rt.normalize(dir))
     dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
+    if  dist > 0 and length2>dist:
+        return length
+    return 0
+
+def especularidadFalseCircle(point, source, circle):
+    medio=circle[0]
+    nuevaFuente=Point(2*medio.x-source.x,2*medio.y-source.y)
+    dir = nuevaFuente-point
+    length = rt.length(dir)
+    length2 = rt.length(rt.normalize(dir))
+    dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
+    dist-=circle[1]*0.0015
     if  dist > 0 and length2>dist:
         return length
     return 0
@@ -42,6 +54,8 @@ def raytrace():
             listSeg=[]
             free = True
             especularidad=0
+            especularidadC=0
+            colorB=0
             ########
             for surface in surfaces:
                 x1, y1 = 0, 0
@@ -81,16 +95,19 @@ def raytrace():
             for seg in segments:                
                 #check if ray intersects with segment
                 dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
-                if seg[2]==True:
-                    especularidad=especularidadTrue(point, source, seg)
+                if seg[2]==False:
+                    especularidad=especularidadFalse(point, source, seg)
                 #if intersection, or if intersection is closer than light source
                 if  dist > 0 and length2>dist:
-                    #free = False
+                    free = False
                     break
             dir = source-point
             for circle in circles:
                 dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
                 dist-=circle[1]*0.0015
+                if circle[2]==False:
+                    especularidadC=especularidadFalseCircle(point, source, circle)
+                    colorB=circle[3]
                 if  dist > 0 and length2>dist:
                     free = False
                     break
@@ -107,6 +124,7 @@ def raytrace():
                 pixel += values
                 if especularidad!=0:
                     intensity = (1-(especularidad/500))**2
+                    intensity/=2
                     #print(len)
                     #intensity = max(0, min(intensity, 255))
                     values = (ref[int(point.y)][int(point.x)])[:3]
@@ -115,7 +133,22 @@ def raytrace():
                     
                     #add all light sources 
                     pixel += values
-            
+
+                    
+                if especularidadC!=0:
+                    intensity = (1-(especularidadC/500))**2
+                    intensity/=2
+                    #print(len)
+                    #intensity = max(0, min(intensity, 255))
+                    values = (ref[int(point.y)][int(point.x)])[:3]
+                    #combine color, light source and light color
+                    if colorB!=0:
+                        intensity*=2
+                        values = np.asarray(colorB) * intensity * light
+                    else:
+                        values = values * intensity * light
+                    #add all light sources
+                    pixel += values
             #average pixel value and assign
             px[int(point.x)][int(point.y)] = pixel // len(sources)
                 
@@ -143,11 +176,13 @@ i = Image.new("RGB", (500, 500), (0, 0, 0) )
 px = np.array(i)
 
 #reference image for background color
-im_file = Image.open("Fondo.jpg")
+im_file = Image.open("Fondo.png")
 ref = np.array(im_file)
 
 #light positions
-sources = [ Point(200,100), Point(350,100)]
+sources = [ Point(250,310)
+            #,Point(350,400)
+            ]
 lineal_sources = [
                  ([Point(10, 40), Point(30, 70)])#,
                  #([Point(100, 160), Point(100, 260)])
@@ -160,18 +195,18 @@ segments = [
             
             #([Point(180, 230), Point(330, 230)])
             #([Point(190, 230), Point(260, 230), True]),
-            ([Point(100, 160), Point(100, 260), True])
+            ([Point(100, 160), Point(100, 260), False])
             ]
 
 circles = [
-            (Point(330, 180),32)
-           ]
-############
+            (Point(330, 180),32,False,[84,121,215])
+            ]
+############(84,121,215)
 surfaces = [
 
-    (surface(Point(383,31),Point(420,65),False)),
-    (surface(Point(43,231),Point(82,165),False)),
-    (surface(Point(83,131),Point(120,145),False)),
+    #(surface(Point(383,31),Point(420,65),False)),
+    #(surface(Point(43,231),Point(82,165),False)),
+    #(surface(Point(83,131),Point(120,145),False)),
 
     ]
 #############
