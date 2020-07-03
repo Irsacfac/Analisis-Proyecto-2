@@ -34,7 +34,7 @@ def especularidadTrue(point, source, seg):
     #distancia desde origen hasta interseccion, en eje x
     d = x-source.x
     if(d < 0):
-        reflejo = Point(x+d, source.y)
+        reflejo = Point(x-d, source.y)
     else:
         reflejo = Point(x+d, source.y)
 
@@ -59,8 +59,9 @@ def especularidadFalseCircle(point, source, circle):
     dir = nuevaFuente-point
     length = rt.length(dir)
     length2 = rt.length(rt.normalize(dir))
+    distanciaFuente=point.distance(circle[0],nuevaFuente)
     dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-    dist-=circle[1]*0.0015
+    dist-=circle[1]*distanciaFuente*0.00001
     if  dist > 0 and length2>dist:
         return length
     return 0
@@ -108,8 +109,9 @@ def raytrace():
                 #if rt.inRadio(point, circle[0], circle[1]):
                     #free = False
                     #break
+                distanciaFuente=point.distance(circle[0],source)
                 dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-                dist-=circle[1]*0.001
+                dist-=circle[1]*distanciaFuente*0.00001
                 if circle[2]==False:
                     especularidadC=especularidadFalseCircle(point, source, circle)
                     colorB=circle[3]
@@ -200,7 +202,7 @@ light = np.array([0.85, 0.85, 0.55])
 segments = [
             
             #([Point(190, 230), Point(260, 230), False]),
-            #([Point(100, 160), Point(100, 260), False]),
+            #([Point(100, 160), Point(101, 260), True]),
             #([Point(190, 230), Point(260, 230), True]),
             ([Point(190, 230), Point(260, 231), True]),
             #([Point(290, 330), Point(360, 331), True]),
