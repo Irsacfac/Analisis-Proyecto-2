@@ -215,6 +215,7 @@ circles = [
             ]
 ############(84,121,215)
 
+
 #thread setup
 t = threading.Thread(target = raytrace) # f being the function that tells how the ball should move
 t.setDaemon(True) # Alternatively, you can use "t.daemon = True"
