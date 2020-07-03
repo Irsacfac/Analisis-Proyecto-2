@@ -8,7 +8,7 @@ import rt
 import math
 import threading
 
-def especularidadTrue(point, source, seg):
+def especularidadFalse(point, source, seg):
     medio=Point((seg[0].x+seg[1].x)/2,(seg[0].y+seg[1].y)/2)
     nuevaFuente=Point(2*medio.x-source.x,2*medio.y-source.y)
     dir = nuevaFuente-point
@@ -18,6 +18,40 @@ def especularidadTrue(point, source, seg):
     if  dist > 0 and length2>dist:
         return length
     return 0
+
+def especularidadTrue(point, source, seg):
+    #ecuacion recta punto-fuente
+    m1 = (point.y-source.y)/(point.x-source.x)
+    b1 = point.y - (m1*point.x)
+    #ecuacion recta ambos puntos del segmento
+    m2 = (seg[1].y-seg[0].y)/(seg[1].x-seg[0].x)
+    b2 = seg[1].y - (m2*seg[1].x)
+    #despejamos x
+    x = (b2-b1)/(m1-m2)
+    #buscamos la y
+    y = (m1*x) + b1
+    interseccion = Point(x,y)
+    #distancia desde origen hasta interseccion, en eje x
+    d = x-source.x
+    if(d < 0):
+        reflejo = Point(x+d, source.y)
+    else:
+        reflejo = Point(x+d, source.y)
+
+    #ecuacion de la recta del reflejo
+    m3 = (y - reflejo.y)/(x-reflejo.x)
+    b3 = y - (m3*x)
+        
+    dir = interseccion-reflejo
+    length = rt.length(dir)
+    length2 = rt.length(rt.normalize(dir))
+    dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
+    if  dist > 0 and length2>dist:
+        #return [length, m3, b3]
+        return length
+    #return [0,0,0]
+    return 0
+
 
 def raytrace():
     #Raytraces the scene progessively
@@ -42,55 +76,27 @@ def raytrace():
             listSeg=[]
             free = True
             especularidad=0
-            ########
-            for surface in surfaces:
-                x1, y1 = 0, 0
-                if (surface.itsIn(point)):
-                    if(surface.especularidad):
-                        free = True
-                    else:
-                        right = source.x <= point.x
-                        up = source.y <= point.y
-                        reflexion = [random.uniform(1, 50), random.uniform(1, 20)]
-                        if(right):
-                            x1 = point.x + point.x*reflexion[0]/100
-                        else:
-                            x1 = point.x - point.x*reflexion[0]/100
-                        if(up):
-                            y1 = point.y - point.y*reflexion[1]/100
-                        else:
-                            y1 = point.y + point.y*reflexion[1]/100
-                        if(x1 > 500 or y1 > 500):
-                            x1 = x1 - x1 * 0.3
-                            y1 = y1 - y1 * 0.3
-                        if(x1 < 0 or y1 < 0):
-                            x1 = x1 + x1 * 0.3
-                            y1 = y1 + y1 * 0.3
-                        intensity = (1-(length/100))**2
-                        #print(len)
-                        #intensity = max(0, min(intensity, 255))
-                        values = (ref[int(y1)][int(x1)])[:3]
-                        #combine color, light source and light color
-                        values = values * intensity * light / 10
-                    
-                        #add all light sources 
-                        pixel += values
-                        especularidad = 1
-                        break
-            ##############
+
+            
             for seg in segments:                
                 #check if ray intersects with segment
                 dist = rt.raySegmentIntersect(point, dir, seg[0], seg[1])
-                if seg[2]==True:
-                    especularidad=especularidadTrue(point, source, seg)
+                if seg[2]==False:
+                    especularidad=especularidadFalse(point, source, seg)
+                else:
+                    #data = especularidadTrue(point, source, seg)
+                    especularidad = especularidadTrue(point, source, seg)
                 #if intersection, or if intersection is closer than light source
                 if  dist > 0 and length2>dist:
-                    #free = False
+                    free = False
                     break
             dir = source-point
             for circle in circles:
+                #if rt.inRadio(point, circle[0], circle[1]):
+                    #free = False
+                    #break
                 dist = rt.rayCircleIntersect(point, dir, circle[0], circle[1])
-                dist-=circle[1]*0.0015
+                dist-=circle[1]*0.001
                 if  dist > 0 and length2>dist:
                     free = False
                     break
@@ -147,7 +153,7 @@ im_file = Image.open("Fondo.jpg")
 ref = np.array(im_file)
 
 #light positions
-sources = [ Point(200,100), Point(350,100)]
+sources = [ Point(180,100)]
 lineal_sources = [
                  ([Point(10, 40), Point(30, 70)])#,
                  #([Point(100, 160), Point(100, 260)])
@@ -158,23 +164,18 @@ light = np.array([0.85, 0.85, 0.55])
 #warning, point order affects intersection test!!
 segments = [
             
-            #([Point(180, 230), Point(330, 230)])
+            #([Point(190, 230), Point(260, 230), False]),
+            #([Point(100, 160), Point(100, 260), False]),
             #([Point(190, 230), Point(260, 230), True]),
-            ([Point(100, 160), Point(100, 260), True])
+            ([Point(190, 230), Point(260, 231), True]),
+            #([Point(290, 330), Point(360, 331), True]),
+            
             ]
 
 circles = [
             (Point(330, 180),32)
            ]
-############
-surfaces = [
 
-    (surface(Point(383,31),Point(420,65),False)),
-    (surface(Point(43,231),Point(82,165),False)),
-    (surface(Point(83,131),Point(120,145),False)),
-
-    ]
-#############
 #thread setup
 t = threading.Thread(target = raytrace) # f being the function that tells how the ball should move
 t.setDaemon(True) # Alternatively, you can use "t.daemon = True"
